@@ -151,7 +151,7 @@ export function SimulationCockpit({ onParamsChange }: SimulationCockpitProps) {
       stockVol: 25,
       bondVol: 10,
       correlation: 0.6,
-      lesson: 'Rate-shock regime: stocks and bonds fall together, diversification fails.',
+      lesson: 'Rate-shock regime: stocks and bonds move together, reducing diversification benefit.',
     },
     {
       name: 'Flight to Quality',
@@ -236,11 +236,8 @@ export function SimulationCockpit({ onParamsChange }: SimulationCockpitProps) {
 
             {/* Target Volatility */}
             <div className="pt-4 border-t border-border">
-              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1 block">Target Volatility</label>
-              <p className="text-sm text-foreground mb-3">
-                {(riskParityMetrics.leveragedVolatility * 100).toFixed(1)}% vol → <span className="text-primary font-medium">{leverage.toFixed(1)}x leverage</span>
-              </p>
-              <div className="flex gap-2">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2 block">Target Volatility</label>
+              <div className="flex gap-2 mb-3">
                 {targetVolPresets.map((preset) => (
                   <button
                     key={preset.mode}
@@ -255,6 +252,23 @@ export function SimulationCockpit({ onParamsChange }: SimulationCockpitProps) {
                     {preset.label}
                   </button>
                 ))}
+              </div>
+              <div className="bg-muted/30 rounded-md p-3 space-y-1">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Leverage</span>
+                  <span className="font-medium text-primary">{leverage.toFixed(2)}x</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Volatility</span>
+                  <span className="font-medium">{(riskParityMetrics.leveragedVolatility * 100).toFixed(1)}%</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Expected Return</span>
+                  <span className="font-medium">{(riskParityMetrics.leveragedReturn * 100).toFixed(1)}%</span>
+                </div>
+                <p className="text-[10px] text-muted-foreground pt-1 border-t border-border mt-2">
+                  Leverage scales return and risk equally; Sharpe is unchanged.
+                </p>
               </div>
             </div>
           </CardContent>
@@ -345,10 +359,10 @@ export function SimulationCockpit({ onParamsChange }: SimulationCockpitProps) {
       ) : (
         <div className="text-center p-4 rounded-lg bg-amber-500/10 border border-amber-500/30">
           <p className="text-sm">
-            <span className="font-medium text-amber-600">When risk parity doesn't help</span>
+            <span className="font-medium text-amber-600">Risk parity performs closer to market</span>
           </p>
           <p className="text-xs text-muted-foreground mt-1">
-            High correlation ({(correlation * 100).toFixed(0)}%) means stocks and bonds move together—diversification can't work.
+            High correlation ({(correlation * 100).toFixed(0)}%) reduces the diversification benefit.
           </p>
         </div>
       )}

@@ -1,6 +1,5 @@
 import { BookOpen, Landmark } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import panagoraLogo from '@/assets/logo_Panagora.jpg';
 
 export function CockpitHeader() {
   return (
@@ -11,7 +10,7 @@ export function CockpitHeader() {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <div className="h-10 flex items-center justify-center">
-                <img src={panagoraLogo} alt="PanAgora logo" className="h-10 object-contain" />
+                <img src="/panagora_asset_management_logo.jpg" alt="PanAgora logo" className="h-10 object-contain" />
               </div>
               <div>
                 <h1 className="text-xl font-bold tracking-tight">

@@ -1,0 +1,32 @@
+# Railway ignore file - similar to .gitignore but for Railway deployments
+
+# Development files
+node_modules/
+.vscode/
+.idea/
+*.log
+
+# Build artifacts (will be generated during build)
+dist/
+
+# Test files
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+
+# Documentation (optional - can be included if needed)
+# *.md
+
+# Environment files
+.env.local
+.env.*.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+~$*
+

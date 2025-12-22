@@ -156,7 +156,7 @@ function App() {
         <footer className="border-t border-border mt-8">
           <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between text-xs text-muted-foreground">
             <span><strong className="text-foreground">PanAgora</strong> | Risk Parity Research</span>
-            <span>For educational purposes only</span>
+            <span>For Consideration by Brett Wilzbach</span>
           </div>
         </footer>
       </div>
