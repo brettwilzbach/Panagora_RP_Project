@@ -31,24 +31,24 @@ const strategies: Strategy[] = [
     features: [
       'No leverage required',
       'Lowest volatility option',
-      'Ideal for risk-averse investors',
+      'Appropriate for conservative mandates',
       'True diversification benefits',
     ],
   },
   {
     id: 'balanced',
-    name: 'Leveraged Balanced',
+    name: 'Balanced',
     icon: TrendingUp,
     riskTarget: '8-10%',
     leverage: '2:1',
     description: 'Balanced approach matching traditional portfolio risk',
-    comparable: 'Similar to 60/40 risk, higher Sharpe',
+    comparable: 'Similar to 60/40 risk with improved efficiency',
     expectedReturn: '11.3%',
     features: [
       'Moderate leverage',
       'Comparable to traditional balanced',
-      'Higher returns, same risk',
-      'Most popular implementation',
+      'Higher returns, similar risk',
+      'Common institutional profile',
     ],
     recommended: true,
   },
@@ -64,7 +64,7 @@ const strategies: Strategy[] = [
     features: [
       'Higher leverage deployment',
       'Maximum return potential',
-      'For sophisticated investors',
+      'For sophisticated programs',
       'Requires active management',
     ],
   },
@@ -76,10 +76,10 @@ export function StrategySelector() {
   return (
     <div className="space-y-6">
       <div className="text-center space-y-2">
-        <h2 className="text-2xl font-bold">Implementation Strategies</h2>
+        <h2 className="text-2xl font-bold">Implementation Profiles</h2>
         <p className="text-muted-foreground max-w-2xl mx-auto">
-          Risk Parity can be implemented at various risk levels through leverage.
-          Select the strategy that matches your risk tolerance and return objectives.
+          Risk parity can be implemented across risk levels with differing leverage assumptions.
+          Select the profile that aligns with investment objectives.
         </p>
       </div>
 
@@ -128,7 +128,7 @@ function StrategyCard({ strategy, isSelected, onSelect, index }: StrategyCardPro
           "cursor-pointer transition-all duration-300 hover:-translate-y-1",
           isSelected
             ? "border-primary glow-cyan"
-            : "border-white/10 hover:border-white/20"
+            : "border-border hover:border-primary/30"
         )}
         onClick={onSelect}
       >
@@ -146,7 +146,7 @@ function StrategyCard({ strategy, isSelected, onSelect, index }: StrategyCardPro
               </div>
               {strategy.recommended && (
                 <Badge variant="success" className="text-xs">
-                  Recommended
+                  Institutional
                 </Badge>
               )}
             </div>
@@ -163,14 +163,14 @@ function StrategyCard({ strategy, isSelected, onSelect, index }: StrategyCardPro
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 pt-2 border-t border-white/10">
+            <div className="grid grid-cols-2 gap-3 pt-2 border-t border-border">
               <div>
                 <p className="text-xs text-muted-foreground">Risk Target</p>
-                <p className="font-mono font-semibold">{strategy.riskTarget}</p>
+                <p className="font-semibold numeric">{strategy.riskTarget}</p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Leverage</p>
-                <p className="font-mono font-semibold">{strategy.leverage}</p>
+                <p className="font-semibold numeric">{strategy.leverage}</p>
               </div>
             </div>
 
@@ -201,12 +201,12 @@ function StrategyDetails({ strategy }: StrategyDetailsProps) {
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-lg">{strategy.name} Strategy Details</CardTitle>
+            <CardTitle className="text-lg">{strategy.name} Profile Details</CardTitle>
             <CardDescription>{strategy.comparable}</CardDescription>
           </div>
           <div className="text-right">
             <p className="text-xs text-muted-foreground">Expected Return</p>
-            <p className="text-2xl font-mono font-bold text-accent">{strategy.expectedReturn}</p>
+            <p className="text-2xl font-bold text-accent numeric">{strategy.expectedReturn}</p>
           </div>
         </div>
       </CardHeader>

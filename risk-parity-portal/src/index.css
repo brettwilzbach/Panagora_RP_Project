@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Source+Serif+4:wght@300;400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,41 +6,41 @@
 
 @layer base {
   :root {
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
+    --background: 0 0% 100%;
+    --foreground: 220 25% 10%;
 
-    --card: 217 33% 17%;
-    --card-foreground: 210 40% 98%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 25% 10%;
 
-    --popover: 217 33% 17%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 25% 10%;
 
-    --primary: 199 89% 48%;
-    --primary-foreground: 222 47% 11%;
+    --primary: 168 65% 32%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 217 33% 25%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 168 20% 96%;
+    --secondary-foreground: 220 25% 15%;
 
-    --muted: 217 33% 25%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 220 15% 95%;
+    --muted-foreground: 220 15% 40%;
 
-    --accent: 142 71% 45%;
-    --accent-foreground: 222 47% 11%;
+    --accent: 168 55% 28%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 70% 45%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 217 33% 25%;
-    --input: 217 33% 25%;
-    --ring: 199 89% 48%;
+    --border: 220 15% 85%;
+    --input: 220 15% 85%;
+    --ring: 168 65% 32%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
-    --chart-1: 199 89% 48%;
-    --chart-2: 142 71% 45%;
-    --chart-3: 45 93% 47%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 0 84% 60%;
+    --chart-1: 168 65% 32%;
+    --chart-2: 0 65% 50%;
+    --chart-3: 168 50% 22%;
+    --chart-4: 220 20% 45%;
+    --chart-5: 45 80% 45%;
   }
 
   * {
@@ -49,11 +49,16 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Source Serif 4', 'Times New Roman', serif;
     font-synthesis: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5 {
+    font-family: 'Cormorant Garamond', 'Times New Roman', serif;
+    letter-spacing: 0.01em;
   }
 
   html, body, #root {
@@ -67,52 +72,44 @@
 
 @layer components {
   .glass-panel {
-    @apply bg-card/80 backdrop-blur-md border border-white/10 rounded-lg;
-    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+    @apply bg-card border rounded-lg;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
   }
 
   .cockpit-grid {
-    background-image:
-      linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px);
-    background-size: 50px 50px;
+    background-color: hsl(var(--background));
   }
 
   .glow-cyan {
-    box-shadow: 0 0 20px rgba(14, 165, 233, 0.3), 0 0 40px rgba(14, 165, 233, 0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 8px 24px rgba(0, 0, 0, 0.08);
   }
 
   .glow-green {
-    box-shadow: 0 0 20px rgba(34, 197, 94, 0.3), 0 0 40px rgba(34, 197, 94, 0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 8px 24px rgba(0, 0, 0, 0.08);
   }
 
   .glow-red {
-    box-shadow: 0 0 20px rgba(239, 68, 68, 0.3), 0 0 40px rgba(239, 68, 68, 0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 8px 24px rgba(0, 0, 0, 0.08);
   }
 
   .metric-display {
-    @apply font-mono text-2xl font-semibold tracking-tight;
+    @apply text-2xl font-semibold tracking-tight;
+    font-variant-numeric: tabular-nums;
   }
 
   .metric-label {
-    @apply text-xs uppercase tracking-widest text-muted-foreground;
+    @apply text-[0.7rem] uppercase tracking-[0.15em] text-muted-foreground font-medium;
   }
 
   .instrument-panel {
-    @apply relative overflow-hidden rounded-xl border border-white/10;
-    background: linear-gradient(180deg, hsl(217, 33%, 17%) 0%, hsl(222, 47%, 11%) 100%);
-  }
-
-  .instrument-panel::before {
-    content: '';
-    @apply absolute inset-0 opacity-50;
-    background: radial-gradient(ellipse at top, rgba(14, 165, 233, 0.1) 0%, transparent 70%);
+    @apply relative overflow-hidden rounded-xl border border-border bg-card;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   }
 }
 
 @layer utilities {
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent;
+    @apply text-primary;
   }
 
   .animate-in {
@@ -136,5 +133,10 @@
 
   .hover-lift:hover {
     @apply -translate-y-0.5;
+  }
+
+  .numeric {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
   }
 }

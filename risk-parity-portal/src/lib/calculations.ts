@@ -1,5 +1,5 @@
-// Risk Parity Portfolio Calculations based on PanAgora Research
-// Reference: "Risk Parity Portfolios: Efficient Portfolios Through True Diversification"
+// Risk Parity Portfolio Calculations
+// Core mathematical framework for comparing traditional and risk-balanced portfolio allocations
 
 export interface PortfolioInputs {
   stockVolatility: number;    // Annual standard deviation (e.g., 0.151 for 15.1%)
@@ -29,14 +29,15 @@ export interface RiskParityWeights {
   bondWeight: number;
 }
 
-// Default values from PanAgora research (1983-2004 data)
+// Default calibration values for demonstration
+// Based on long-term historical averages (AQR 1947-2015 study)
 export const PANAGORA_DEFAULTS = {
-  stockVolatility: 0.151,      // 15.1% Russell 1000
-  bondVolatility: 0.046,       // 4.6% Lehman Aggregate
-  correlation: 0.2,
-  riskFreeRate: 0.02,
-  stockSharpe: 0.55,           // Historical stock Sharpe
-  bondSharpe: 0.80,            // Historical bond Sharpe
+  stockVolatility: 0.15,       // Long-term equity volatility ~15%
+  bondVolatility: 0.05,        // Long-term bond volatility ~5%
+  correlation: 0.1,            // Historical avg stock-bond correlation
+  riskFreeRate: 0.02,          // Risk-free rate assumption
+  stockSharpe: 0.40,           // Long-term equity Sharpe ratio
+  bondSharpe: 0.35,            // Long-term bond Sharpe ratio
   traditionalStockWeight: 0.6,
   traditionalBondWeight: 0.4,
 };

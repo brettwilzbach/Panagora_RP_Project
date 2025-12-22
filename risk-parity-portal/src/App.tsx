@@ -3,209 +3,160 @@ import { motion } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { CockpitHeader } from '@/components/dashboard/CockpitHeader';
-import { MetricCard, MetricsGrid, ComparisonMetric } from '@/components/dashboard/MetricsDisplay';
 import { EggBasketVisualizer } from '@/components/visualizers/EggBasketVisualizer';
-import { RiskContributionChart } from '@/components/visualizers/RiskContributionChart';
 import { EfficientFrontier } from '@/components/visualizers/EfficientFrontier';
 import { SimulationCockpit } from '@/components/simulation/SimulationCockpit';
-import { PhilosophySection, TwinEngineAnalogy, ValueProposition } from '@/components/education/PhilosophyCards';
-import { StrategySelector } from '@/components/strategy/StrategySelector';
 import { PANAGORA_DEFAULTS } from '@/lib/calculations';
 
 function App() {
   const [activeTab, setActiveTab] = useState('overview');
+  const [simParams, setSimParams] = useState({
+    stockVol: PANAGORA_DEFAULTS.stockVolatility,
+    bondVol: PANAGORA_DEFAULTS.bondVolatility,
+    correlation: PANAGORA_DEFAULTS.correlation,
+    leverage: 1,
+  });
 
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-background cockpit-grid">
+      <div className="min-h-screen bg-background">
         <CockpitHeader />
 
-        <main className="max-w-7xl mx-auto px-6 py-8">
+        <main className="max-w-6xl mx-auto px-6 py-6">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid grid-cols-4 w-full max-w-xl mx-auto">
+            <TabsList className="grid grid-cols-2 w-full max-w-xs mx-auto">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="simulator">Simulator</TabsTrigger>
-              <TabsTrigger value="strategies">Strategies</TabsTrigger>
-              <TabsTrigger value="learn">Learn</TabsTrigger>
             </TabsList>
 
-            {/* Overview Tab */}
-            <TabsContent value="overview" className="space-y-6">
+            {/* Overview Tab - Educational narrative */}
+            <TabsContent value="overview" className="space-y-5">
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="space-y-6"
+                className="space-y-5"
               >
-                {/* Hero Section */}
-                <div className="text-center space-y-4 py-6">
-                  <h1 className="text-4xl font-bold tracking-tight">
-                    <span className="text-gradient">Risk Parity</span> Discovery Portal
+                {/* Lead with risk - the hook */}
+                <div className="text-center">
+                  <h1 className="text-2xl font-bold text-foreground mb-2">
+                    60/40 looks balanced by dollars,<br />
+                    but it's <span className="text-primary">93% equity risk</span>.
                   </h1>
-                  <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-                    Discover why traditional 60/40 portfolios aren't as diversified as they appear,
-                    and how Risk Parity achieves true diversification through equal risk contribution.
+                </div>
+
+                {/* Define terms once */}
+                <div className="flex justify-center gap-6 text-xs text-muted-foreground">
+                  <span><strong className="text-foreground">Capital</strong> = dollars invested</span>
+                  <span><strong className="text-foreground">Risk</strong> = where drawdowns come from</span>
+                  <span><strong className="text-foreground">Sharpe</strong> = return per unit of risk</span>
+                </div>
+
+                {/* The 5-step narrative */}
+                <div className="max-w-xl mx-auto space-y-3 text-sm">
+                  <div className="p-3 rounded-lg bg-muted/50 flex gap-3">
+                    <span className="text-primary font-bold">1</span>
+                    <p className="text-muted-foreground">
+                      <strong className="text-foreground">Risk is not the same as dollars.</strong> Stocks are 3x more volatile than bonds, so 60% in stocks = 93% of your risk.
+                    </p>
+                  </div>
+
+                  <div className="p-3 rounded-lg bg-primary/5 border border-primary/20 flex gap-3">
+                    <span className="text-primary font-bold">2</span>
+                    <p className="text-muted-foreground">
+                      <strong className="text-primary">Risk parity balances risk at 50/50.</strong> Hold 3x more bonds than stocks by capital (~25/75) to equalize risk contribution.
+                    </p>
+                  </div>
+
+                  <div className="p-3 rounded-lg bg-muted/50 flex gap-3">
+                    <span className="text-primary font-bold">3</span>
+                    <p className="text-muted-foreground">
+                      <strong className="text-foreground">When correlation is low, that balance pays off.</strong> You get more return per unit of risk (higher Sharpe).
+                    </p>
+                  </div>
+
+                  <div className="p-3 rounded-lg bg-muted/50 flex gap-3">
+                    <span className="text-primary font-bold">4</span>
+                    <p className="text-muted-foreground">
+                      <strong className="text-foreground">When correlation spikes, the advantage fades.</strong> If stocks and bonds move together, risk parity can't diversify.
+                    </p>
+                  </div>
+
+                  <div className="p-3 rounded-lg bg-muted/50 flex gap-3">
+                    <span className="text-primary font-bold">5</span>
+                    <p className="text-muted-foreground">
+                      <strong className="text-foreground">That's why the approach is resilient, not omnipotent.</strong> It works best when diversification works.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Result stat - updated with S&P data */}
+                <div className="text-center p-4 rounded-lg bg-primary/5 border border-primary/20">
+                  <p className="text-lg font-medium">
+                    <span className="text-muted-foreground">0.65 Sharpe (60/40)</span>
+                    {' → '}
+                    <span className="text-primary">0.87 Sharpe (Risk Parity)</span>
+                    {' '}
+                    <span className="text-primary font-bold">+34%</span>
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    S&P Risk Parity Index (10% vol target) vs 60/40, 2004-2020
                   </p>
                 </div>
 
-                {/* Key Metrics */}
-                <MetricsGrid columns={4}>
-                  <MetricCard
-                    label="Traditional 60/40 Sharpe"
-                    value="0.67"
-                    subValue="Lower efficiency"
-                  />
-                  <MetricCard
-                    label="Risk Parity Sharpe"
-                    value="0.87"
-                    subValue="+30% improvement"
-                    highlight
-                    trend="up"
-                  />
-                  <MetricCard
-                    label="Stock Risk in 60/40"
-                    value="93%"
-                    subValue="Concentrated risk"
-                    trend="down"
-                  />
-                  <MetricCard
-                    label="Stock Risk in Parity"
-                    value="50%"
-                    subValue="True diversification"
-                    highlight
-                    trend="up"
-                  />
-                </MetricsGrid>
-
-                {/* Egg Basket Visualizer */}
-                <EggBasketVisualizer />
-
-                {/* Risk Comparison */}
-                <div className="grid lg:grid-cols-2 gap-6">
-                  <RiskContributionChart
-                    traditionalStock={93}
-                    traditionalBond={7}
-                    riskParityStock={50}
-                    riskParityBond={50}
-                  />
-                  <EfficientFrontier
-                    stockVol={PANAGORA_DEFAULTS.stockVolatility}
-                    bondVol={PANAGORA_DEFAULTS.bondVolatility}
-                    correlation={PANAGORA_DEFAULTS.correlation}
-                    showLeveragedFrontier={false}
-                  />
+                {/* So what - investor outcomes */}
+                <div className="text-center text-sm text-muted-foreground max-w-md mx-auto">
+                  <strong className="text-foreground">The result:</strong> Drawdown control and a smoother ride, without sacrificing long-term returns.
                 </div>
 
-                {/* Twin Engine Analogy */}
-                <TwinEngineAnalogy />
+                {/* Main visual - Egg basket toggle */}
+                <EggBasketVisualizer />
+
+                {/* PanAgora advantage + CTA */}
+                <div className="text-center space-y-3">
+                  <p className="text-xs text-muted-foreground">
+                    <strong className="text-foreground">PanAgora edge:</strong> Smart data with economic intuition—attribution-aware optimization reduces quant-PM disconnect.
+                  </p>
+                  <button
+                    onClick={() => setActiveTab('simulator')}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors text-sm"
+                  >
+                    Explore the Simulator
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </button>
+                </div>
               </motion.div>
             </TabsContent>
 
             {/* Simulator Tab */}
             <TabsContent value="simulator" className="space-y-6">
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
+                className="space-y-6"
               >
-                <SimulationCockpit />
-
-                {/* Efficient Frontier with Leverage */}
-                <div className="mt-6">
-                  <EfficientFrontier
-                    stockVol={PANAGORA_DEFAULTS.stockVolatility}
-                    bondVol={PANAGORA_DEFAULTS.bondVolatility}
-                    correlation={PANAGORA_DEFAULTS.correlation}
-                    showLeveragedFrontier
-                  />
-                </div>
-              </motion.div>
-            </TabsContent>
-
-            {/* Strategies Tab */}
-            <TabsContent value="strategies" className="space-y-6">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-              >
-                <StrategySelector />
-
-                {/* Value Proposition */}
-                <div className="mt-8">
-                  <ValueProposition />
-                </div>
-              </motion.div>
-            </TabsContent>
-
-            {/* Learn Tab */}
-            <TabsContent value="learn" className="space-y-6">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="space-y-8"
-              >
-                {/* Philosophy Cards */}
-                <PhilosophySection />
-
-                {/* Twin Engine Analogy */}
-                <TwinEngineAnalogy />
-
-                {/* Educational Content */}
-                <div className="grid md:grid-cols-2 gap-6">
-                  <ComparisonMetric
-                    label="Sharpe Ratio Comparison"
-                    traditional={{ value: '0.67', label: '60/40 Portfolio' }}
-                    riskParity={{ value: '0.87', label: 'Risk Parity' }}
-                    improvement="+30% more return per unit of risk"
-                  />
-                  <ComparisonMetric
-                    label="Risk Concentration"
-                    traditional={{ value: '93%', label: 'Stock Risk in 60/40' }}
-                    riskParity={{ value: '50%', label: 'Stock Risk in Parity' }}
-                    improvement="True 50/50 risk diversification"
-                  />
-                </div>
-
-                {/* Data Sources */}
-                <div className="p-6 rounded-xl border border-white/10 bg-card/50">
-                  <h3 className="font-semibold mb-3">Research Data Sources</h3>
-                  <div className="grid md:grid-cols-2 gap-4 text-sm text-muted-foreground">
-                    <div>
-                      <p className="font-medium text-foreground mb-1">Historical Analysis Period</p>
-                      <p>1983 - 2004 (Russell 1000 & Lehman Aggregate Bond Index)</p>
-                    </div>
-                    <div>
-                      <p className="font-medium text-foreground mb-1">Key Parameters</p>
-                      <p>Stock Vol: 15.1% | Bond Vol: 4.6% | Correlation: 0.2</p>
-                    </div>
-                    <div>
-                      <p className="font-medium text-foreground mb-1">Asset Classes</p>
-                      <p>US Large-cap, Small-cap, International, EM Equity, Govt & Corp Bonds, TIPS, Commodities</p>
-                    </div>
-                    <div>
-                      <p className="font-medium text-foreground mb-1">Source</p>
-                      <p>PanAgora Asset Management - "Risk Parity Portfolios: Efficient Portfolios Through True Diversification"</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Value Proposition */}
-                <ValueProposition />
+                <SimulationCockpit onParamsChange={setSimParams} />
+                <EfficientFrontier
+                  stockVol={simParams.stockVol}
+                  bondVol={simParams.bondVol}
+                  correlation={simParams.correlation}
+                  leverage={simParams.leverage}
+                  showLeveragedFrontier
+                  showCapitalMarketLine
+                  interactive
+                  height={400}
+                />
               </motion.div>
             </TabsContent>
           </Tabs>
         </main>
 
-        {/* Footer */}
-        <footer className="border-t border-white/10 mt-12">
-          <div className="max-w-7xl mx-auto px-6 py-6">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-              <p>
-                <span className="font-semibold text-foreground">PanAgora Asset Management</span>
-                {' '}| Risk Parity Discovery Portal
-              </p>
-              <p className="text-xs">
-                For educational purposes only. Past performance is not a guarantee of future results.
-              </p>
-            </div>
+        {/* Minimal Footer */}
+        <footer className="border-t border-border mt-8">
+          <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between text-xs text-muted-foreground">
+            <span><strong className="text-foreground">PanAgora</strong> | Risk Parity Research</span>
+            <span>For educational purposes only</span>
           </div>
         </footer>
       </div>

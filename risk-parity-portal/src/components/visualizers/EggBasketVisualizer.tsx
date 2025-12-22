@@ -13,8 +13,8 @@ interface EggBasketVisualizerProps {
 }
 
 const COLORS = {
-  stock: 'hsl(199, 89%, 48%)',
-  bond: 'hsl(142, 71%, 45%)',
+  stock: 'hsl(var(--primary))',
+  bond: '#9ca3af', // Gray to avoid red/green financial connotations
 };
 
 export function EggBasketVisualizer({
@@ -42,9 +42,9 @@ export function EggBasketVisualizer({
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-lg">The "Eggs in One Basket" Problem</CardTitle>
+            <CardTitle className="text-lg">Capital vs Risk Concentration</CardTitle>
             <CardDescription>
-              Traditional 60/40 appears balanced, but risk tells a different story
+              A 60/40 capital split can mask significant risk concentration
             </CardDescription>
           </div>
           <div className="flex items-center gap-3">
@@ -125,7 +125,7 @@ export function EggBasketVisualizer({
                       color="primary"
                     />
                   </div>
-                  <span className="text-sm font-mono w-12 text-right">
+                  <span className="text-sm numeric w-12 text-right">
                     {showRiskView ? `${stockRiskContribution}%` : `${stockCapitalAllocation}%`}
                   </span>
                 </div>
@@ -140,7 +140,7 @@ export function EggBasketVisualizer({
                       color="accent"
                     />
                   </div>
-                  <span className="text-sm font-mono w-12 text-right">
+                  <span className="text-sm numeric w-12 text-right">
                     {showRiskView ? `${bondRiskContribution}%` : `${bondCapitalAllocation}%`}
                   </span>
                 </div>
@@ -158,14 +158,14 @@ export function EggBasketVisualizer({
                 >
                   {showRiskView ? (
                     <p>
-                      <strong>The Hidden Truth:</strong> Stocks contribute{' '}
-                      <span className="font-mono">{stockRiskContribution}%</span> of portfolio risk,
-                      meaning a stock market crash will drive almost all losses.
+                      <strong>Risk Concentration:</strong> Stocks contribute{' '}
+                      <span className="numeric">{stockRiskContribution}%</span> of portfolio risk,
+                      so equity drawdowns dominate outcomes.
                     </p>
                   ) : (
                     <p>
-                      <strong>Surface Appearance:</strong> A 60/40 split looks diversified
-                      by capital, but this masks the true risk concentration.
+                      <strong>Capital Allocation:</strong> The split appears balanced, but
+                      it does not reflect the underlying risk contribution.
                     </p>
                   )}
                 </motion.div>
@@ -193,7 +193,7 @@ function EggGroup({ count, size, color }: EggGroupProps) {
 
   const colorClasses = {
     primary: 'bg-primary/80 border-primary',
-    accent: 'bg-accent/80 border-accent',
+    accent: 'bg-gray-400/80 border-gray-400',
   };
 
   return (

@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Plane, Database, Target, Zap, Shield } from 'lucide-react';
+import { BookOpen, Library, Scale, Shield, TrendingDown } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   Tooltip,
@@ -22,19 +22,19 @@ const colorMap = {
     bg: 'bg-primary/10',
     border: 'border-primary/30',
     text: 'text-primary',
-    glow: 'hover:shadow-[0_0_30px_rgba(14,165,233,0.2)]',
+    glow: 'hover:shadow-[0_12px_28px_rgba(17,24,39,0.1)]',
   },
   accent: {
     bg: 'bg-accent/10',
     border: 'border-accent/30',
     text: 'text-accent',
-    glow: 'hover:shadow-[0_0_30px_rgba(34,197,94,0.2)]',
+    glow: 'hover:shadow-[0_12px_28px_rgba(17,24,39,0.1)]',
   },
   warning: {
     bg: 'bg-yellow-500/10',
     border: 'border-yellow-500/30',
-    text: 'text-yellow-500',
-    glow: 'hover:shadow-[0_0_30px_rgba(234,179,8,0.2)]',
+    text: 'text-yellow-600',
+    glow: 'hover:shadow-[0_12px_28px_rgba(17,24,39,0.1)]',
   },
 };
 
@@ -83,24 +83,24 @@ function PhilosophyCard({ icon: Icon, title, description, detail, color }: Philo
 export function PhilosophySection() {
   const cards: PhilosophyCardProps[] = [
     {
-      icon: Plane,
-      title: "The Pilot's Instinct",
-      description: "Human-machine synthesis for optimal decisions",
-      detail: "Like a pilot flying a high-performance jet, quantitative models provide the engine power, but human intelligence provides the intuitive causality to avoid overextending the machine. This 'Discovery & Dollars' philosophy ensures the model doesn't fly blind.",
+      icon: BookOpen,
+      title: 'Prudent Judgment',
+      description: 'Evidence-led investment decisions',
+      detail: 'Quantitative models provide breadth and consistency, but judgment and economic intuition guide how signals are interpreted and applied. This discipline keeps the process grounded in real-world drivers.',
       color: 'primary',
     },
     {
-      icon: Database,
-      title: "Smart Data vs Big Data",
-      description: "Quality over quantity in signal generation",
-      detail: "Our models aren't black boxes. Every input must 'make sense' fundamentally. We focus on smart data with demonstrable alpha rather than drowning in noise. Each signal is tested for economic intuition before deployment.",
+      icon: Library,
+      title: 'Research Discipline',
+      description: 'Transparent inputs with economic intuition',
+      detail: 'Signals are evaluated for durability, economic rationale, and robustness before entering any model. The emphasis is on clarity and explainability over complexity for its own sake.',
       color: 'accent',
     },
     {
-      icon: Target,
-      title: "True Diversification",
-      description: "Risk allocation, not just capital allocation",
-      detail: "Alternative investments often correlate with stocks during crises—the exact time diversification matters most. Risk Parity achieves true diversification by equalizing risk contribution, not just spreading capital across assets.",
+      icon: Scale,
+      title: 'True Diversification',
+      description: 'Risk allocation, not just capital allocation',
+      detail: 'Diversification matters most in stressed markets. Risk parity balances contributions across asset classes rather than merely spreading capital.',
       color: 'warning',
     },
   ];
@@ -129,25 +129,24 @@ export function TwinEngineAnalogy() {
     <Card className="overflow-hidden">
       <CardContent className="p-6">
         <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center shrink-0">
-            <Plane className="w-6 h-6 text-primary" />
+          <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 border border-border">
+            <Scale className="w-6 h-6 text-primary" />
           </div>
           <div className="space-y-3">
-            <h3 className="font-semibold text-lg">The Twin-Engine Analogy</h3>
+            <h3 className="font-semibold text-lg">The Balanced Mandate Analogy</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Think of a traditional 60/40 portfolio as a twin-engine plane where one engine (stocks)
-              provides <span className="text-primary font-semibold">93% of the power</span> while the other
-              (bonds) provides only <span className="text-accent font-semibold">7%</span>.
+              Consider a traditional 60/40 allocation as a two-pillar mandate where one pillar (stocks)
+              carries <span className="text-primary font-semibold">93% of portfolio risk</span> while the other
+              (bonds) accounts for only <span className="text-accent font-semibold">7%</span>.
             </p>
             <div className="grid md:grid-cols-2 gap-4 pt-2">
-              <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/30">
+              <div className="p-3 rounded-lg bg-destructive/5 border border-destructive/30">
                 <div className="flex items-center gap-2 mb-2">
-                  <Zap className="w-4 h-4 text-destructive" />
+                  <TrendingDown className="w-4 h-4 text-destructive" />
                   <span className="text-sm font-medium text-destructive">Traditional 60/40</span>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  If the stock engine fails, the plane loses nearly all its thrust. A market crash
-                  devastates the entire portfolio.
+                  A single dominant risk factor can drive outcomes during equity drawdowns.
                 </p>
               </div>
               <div className="p-3 rounded-lg bg-accent/10 border border-accent/30">
@@ -156,8 +155,7 @@ export function TwinEngineAnalogy() {
                   <span className="text-sm font-medium text-accent">Risk Parity</span>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Both engines provide equal thrust. Even if one hits turbulence, the other is
-                  powerful enough to keep the flight stable.
+                  Risk contribution is balanced across asset classes, improving resilience across cycles.
                 </p>
               </div>
             </div>
@@ -175,24 +173,24 @@ export function ValueProposition() {
         <div className="space-y-4">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-accent/20 flex items-center justify-center">
-              <Target className="w-4 h-4 text-accent" />
+              <Scale className="w-4 h-4 text-accent" />
             </div>
-            <h3 className="font-semibold">PanAgora's Unique Value Proposition</h3>
+            <h3 className="font-semibold">PanAgora Research Perspective</h3>
           </div>
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <h4 className="text-sm font-medium text-primary">Competitive Advantage</h4>
+              <h4 className="text-sm font-medium text-primary">Portfolio Construction</h4>
               <p className="text-xs text-muted-foreground">
                 Our proprietary algorithm ensures the actual portfolio closely blends with model
                 performance by integrating performance attribution directly into the optimization
-                process—a system developed to solve the "Quant-PM disconnect".
+                process, a system designed to reduce the quant-PM disconnect.
               </p>
             </div>
             <div className="space-y-2">
-              <h4 className="text-sm font-medium text-accent">True Diversification</h4>
+              <h4 className="text-sm font-medium text-accent">Risk Balance</h4>
               <p className="text-xs text-muted-foreground">
                 By allocating risk equally rather than just capital, we achieve superior Sharpe
-                Ratios (<span className="font-mono">0.87 vs 0.67</span>) and more resilient wealth
+                Ratios (<span className="numeric">0.87 vs 0.67</span>) and more resilient wealth
                 creation across economic cycles.
               </p>
             </div>

@@ -25,19 +25,19 @@ export function MetricCard({ label, value, subValue, trend, highlight, className
         <p className="metric-label mb-1">{label}</p>
         <div className="flex items-baseline gap-2">
           <p className={cn(
-            "metric-display",
+            "metric-display numeric",
             highlight ? "text-primary" : "text-foreground"
           )}>
             {value}
           </p>
           {trend && (
             <span className={cn(
-              "text-sm font-medium",
+              "text-xs font-semibold uppercase tracking-wider",
               trend === 'up' && "text-accent",
               trend === 'down' && "text-destructive",
               trend === 'neutral' && "text-muted-foreground"
             )}>
-              {trend === 'up' ? '↑' : trend === 'down' ? '↓' : '–'}
+              {trend === 'up' ? 'Up' : trend === 'down' ? 'Down' : 'Flat'}
             </span>
           )}
         </div>
@@ -82,15 +82,15 @@ export function ComparisonMetric({ label, traditional, riskParity, improvement }
         <div className="grid grid-cols-2 gap-4">
           <div>
             <p className="text-xs text-muted-foreground mb-1">{traditional.label}</p>
-            <p className="font-mono text-lg text-muted-foreground">{traditional.value}</p>
+            <p className="text-lg text-muted-foreground numeric">{traditional.value}</p>
           </div>
           <div>
             <p className="text-xs text-muted-foreground mb-1">{riskParity.label}</p>
-            <p className="font-mono text-lg text-primary">{riskParity.value}</p>
+            <p className="text-lg text-primary numeric">{riskParity.value}</p>
           </div>
         </div>
         {improvement && (
-          <div className="mt-3 pt-3 border-t border-white/10">
+          <div className="mt-3 pt-3 border-t border-border">
             <span className="text-xs text-accent font-medium">{improvement}</span>
           </div>
         )}

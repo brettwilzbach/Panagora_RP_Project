@@ -44,26 +44,26 @@ export function RiskContributionChart({
               layout="vertical"
               margin={{ top: 0, right: 30, left: 20, bottom: 0 }}
             >
-              <XAxis type="number" domain={[0, 100]} tick={{ fill: 'hsl(215, 20%, 65%)' }} />
+              <XAxis type="number" domain={[0, 100]} tick={{ fill: 'hsl(var(--muted-foreground))' }} />
               <YAxis
                 type="category"
                 dataKey="name"
-                tick={{ fill: 'hsl(210, 40%, 98%)' }}
+                tick={{ fill: 'hsl(var(--foreground))' }}
                 width={100}
               />
-              <Bar dataKey="stocks" stackId="a" fill="hsl(199, 89%, 48%)">
+              <Bar dataKey="stocks" stackId="a" fill="hsl(var(--chart-1))">
                 <LabelList
                   dataKey="stocks"
                   position="center"
-                  fill="white"
+                  fill="hsl(var(--primary-foreground))"
                   formatter={(value) => `${value}%`}
                 />
               </Bar>
-              <Bar dataKey="bonds" stackId="a" fill="hsl(142, 71%, 45%)">
+              <Bar dataKey="bonds" stackId="a" fill="#9ca3af">
                 <LabelList
                   dataKey="bonds"
                   position="center"
-                  fill="white"
+                  fill="hsl(var(--accent-foreground))"
                   formatter={(value) => `${value}%`}
                 />
               </Bar>
@@ -76,7 +76,7 @@ export function RiskContributionChart({
             <span className="text-sm text-muted-foreground">Stocks</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-sm bg-accent" />
+            <div className="w-3 h-3 rounded-sm bg-gray-400" />
             <span className="text-sm text-muted-foreground">Bonds</span>
           </div>
         </div>
@@ -106,7 +106,7 @@ export function RiskBar({ label, stockPercent, bondPercent, highlighted }: RiskB
           initial={{ width: 0 }}
           animate={{ width: `${stockPercent}%` }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
-          className={`bg-primary flex items-center justify-center text-xs font-medium ${
+          className={`bg-primary text-primary-foreground flex items-center justify-center text-xs font-medium ${
             highlighted ? 'glow-cyan' : ''
           }`}
         >
@@ -116,7 +116,7 @@ export function RiskBar({ label, stockPercent, bondPercent, highlighted }: RiskB
           initial={{ width: 0 }}
           animate={{ width: `${bondPercent}%` }}
           transition={{ duration: 0.5, ease: 'easeOut', delay: 0.1 }}
-          className="bg-accent flex items-center justify-center text-xs font-medium text-accent-foreground"
+          className="bg-gray-400 flex items-center justify-center text-xs font-medium text-white"
         >
           {bondPercent > 15 && <span>{bondPercent}%</span>}
         </motion.div>
