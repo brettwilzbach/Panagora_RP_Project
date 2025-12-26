@@ -2,6 +2,10 @@
 
 This guide will help you deploy the PanAgora Risk Parity Discovery Portal to Railway.
 
+## ⚠️ CRITICAL: Root Directory Configuration
+
+**IMPORTANT**: The application is in the `risk-parity-portal/` subdirectory. You **MUST** set the root directory in Railway's dashboard, or the build will fail.
+
 ## Prerequisites
 
 1. A Railway account (sign up at [railway.app](https://railway.app))
@@ -17,13 +21,18 @@ This guide will help you deploy the PanAgora Risk Parity Discovery Portal to Rai
    - Click "New Project"
    - Select "Deploy from GitHub repo"
    - Choose `Panagora_RP_Project` repository
-   - Select the `risk-parity-portal` directory as the root
 
-2. **Configure Build Settings**
+2. **⚠️ SET ROOT DIRECTORY (REQUIRED)**
+   - Go to your service **Settings**
+   - Find **"Root Directory"** field
+   - Enter: `risk-parity-portal`
+   - Click **Save**
+   - **This step is critical - without it, Railway won't find your package.json!**
+
+3. **Configure Build Settings**
    - Railway will auto-detect the Vite project
    - Build Command: `npm run build` (already configured)
    - Start Command: `npm run start` (already configured)
-   - Root Directory: `risk-parity-portal`
 
 3. **Deploy**
    - Railway will automatically:
