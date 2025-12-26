@@ -1,23 +1,27 @@
 // Risk Parity Portfolio Calculations
 // Core mathematical framework for comparing traditional and risk-balanced portfolio allocations
+// Supports 4 asset classes: Global Equity, Global Bonds, Commodities, Cash
+
+export interface AssetClass {
+  name: string;
+  volatility: number;      // Annual standard deviation
+  weight: number;          // Capital allocation (0-1)
+  expectedReturn?: number; // Expected return (derived from Sharpe if not provided)
+  sharpe?: number;         // Sharpe ratio for deriving expected return
+  color: string;           // Display color
+}
 
 export interface PortfolioInputs {
-  stockVolatility: number;    // Annual standard deviation (e.g., 0.151 for 15.1%)
-  bondVolatility: number;     // Annual standard deviation (e.g., 0.046 for 4.6%)
-  correlation: number;        // Correlation between stocks and bonds (e.g., 0.2)
-  stockWeight: number;        // Capital allocation to stocks (e.g., 0.6 for 60%)
-  bondWeight: number;         // Capital allocation to bonds (e.g., 0.4 for 40%)
-  leverage: number;           // Leverage ratio (e.g., 1.0 for unleveraged)
-  riskFreeRate?: number;      // Risk-free rate (default: 0.02 for 2%)
-  stockExpectedReturn?: number;  // Expected stock return (default derived from Sharpe)
-  bondExpectedReturn?: number;   // Expected bond return (default derived from Sharpe)
+  assets: AssetClass[];
+  correlationMatrix: number[][]; // Correlation between all asset pairs
+  leverage: number;
+  riskFreeRate?: number;
 }
 
 export interface PortfolioMetrics {
   portfolioVariance: number;
   portfolioVolatility: number;
-  stockRiskContribution: number;    // As percentage (0-100)
-  bondRiskContribution: number;     // As percentage (0-100)
+  riskContributions: number[];   // Risk contribution per asset (0-100)
   sharpeRatio: number;
   expectedReturn: number;
   leveragedVolatility: number;
@@ -25,119 +29,149 @@ export interface PortfolioMetrics {
 }
 
 export interface RiskParityWeights {
-  stockWeight: number;
-  bondWeight: number;
+  weights: number[];
 }
 
+// Asset class colors
+export const ASSET_COLORS = {
+  equity: 'hsl(var(--primary))',      // Teal
+  bonds: '#9ca3af',                    // Gray
+  commodities: '#d97706',              // Amber/Orange
+  cash: '#6b7280',                     // Dark gray
+};
+
+// Default 4 asset classes based on PanAgora paper
+// Using equal Sharpe ratios for risky assets (efficient market assumption)
+export const DEFAULT_ASSETS: AssetClass[] = [
+  { name: 'Global Equity', volatility: 0.15, weight: 0.60, sharpe: 0.40, color: ASSET_COLORS.equity },
+  { name: 'Global Bonds', volatility: 0.05, weight: 0.30, sharpe: 0.40, color: ASSET_COLORS.bonds },
+  { name: 'Commodities', volatility: 0.20, weight: 0.10, sharpe: 0.30, color: ASSET_COLORS.commodities },
+  { name: 'Cash', volatility: 0.01, weight: 0.00, sharpe: 0.00, color: ASSET_COLORS.cash },
+];
+
+// Traditional 60/40 allocation (stocks/bonds only, no commodities)
+export const TRADITIONAL_WEIGHTS = [0.60, 0.40, 0.00, 0.00];
+
+// Default correlation matrix (simplified, realistic assumptions)
+// Equity, Bonds, Commodities, Cash
+export const DEFAULT_CORRELATIONS: number[][] = [
+  [1.00, 0.10, 0.30, 0.00],  // Equity
+  [0.10, 1.00, 0.00, 0.00],  // Bonds
+  [0.30, 0.00, 1.00, 0.00],  // Commodities
+  [0.00, 0.00, 0.00, 1.00],  // Cash
+];
+
 // Default calibration values for demonstration
-// Based on long-term historical averages (AQR 1947-2015 study)
 export const PANAGORA_DEFAULTS = {
-  stockVolatility: 0.15,       // Long-term equity volatility ~15%
-  bondVolatility: 0.05,        // Long-term bond volatility ~5%
-  correlation: 0.1,            // Historical avg stock-bond correlation
-  riskFreeRate: 0.02,          // Risk-free rate assumption
-  stockSharpe: 0.40,           // Long-term equity Sharpe ratio
-  bondSharpe: 0.35,            // Long-term bond Sharpe ratio
+  stockVolatility: 0.15,
+  bondVolatility: 0.05,
+  commodityVolatility: 0.20,
+  cashVolatility: 0.01,
+  correlation: 0.1,
+  riskFreeRate: 0.02,
+  stockSharpe: 0.40,
+  bondSharpe: 0.40,        // Equal Sharpe = max diversification benefit
+  commoditySharpe: 0.30,
   traditionalStockWeight: 0.6,
   traditionalBondWeight: 0.4,
 };
 
-// Calculate portfolio variance
+// Calculate portfolio variance with multiple assets
 export function calculatePortfolioVariance(inputs: PortfolioInputs): number {
-  const { stockVolatility, bondVolatility, correlation, stockWeight, bondWeight } = inputs;
+  const { assets, correlationMatrix } = inputs;
+  let variance = 0;
 
-  const stockVariance = Math.pow(stockVolatility, 2);
-  const bondVariance = Math.pow(bondVolatility, 2);
-  const covariance = stockVolatility * bondVolatility * correlation;
+  for (let i = 0; i < assets.length; i++) {
+    for (let j = 0; j < assets.length; j++) {
+      const wi = assets[i].weight;
+      const wj = assets[j].weight;
+      const sigmaI = assets[i].volatility;
+      const sigmaJ = assets[j].volatility;
+      const rhoIJ = correlationMatrix[i][j];
 
-  return (
-    Math.pow(stockWeight, 2) * stockVariance +
-    Math.pow(bondWeight, 2) * bondVariance +
-    2 * stockWeight * bondWeight * covariance
-  );
+      variance += wi * wj * sigmaI * sigmaJ * rhoIJ;
+    }
+  }
+
+  return variance;
 }
 
-// Calculate marginal risk contribution
-export function calculateRiskContribution(inputs: PortfolioInputs): { stock: number; bond: number } {
-  const { stockVolatility, bondVolatility, correlation, stockWeight, bondWeight } = inputs;
-
+// Calculate risk contribution for each asset
+export function calculateRiskContributions(inputs: PortfolioInputs): number[] {
+  const { assets, correlationMatrix } = inputs;
   const portfolioVariance = calculatePortfolioVariance(inputs);
   const portfolioVol = Math.sqrt(portfolioVariance);
 
-  const covariance = stockVolatility * bondVolatility * correlation;
+  if (portfolioVol === 0) {
+    return assets.map(() => 0);
+  }
 
-  // Marginal contribution to risk (MCR) = weight * d(sigma_p) / d(weight)
-  // Risk contribution = weight * (weight * variance + otherWeight * covariance) / portfolioVol
+  const contributions: number[] = [];
 
-  const stockContribution = stockWeight * (
-    stockWeight * Math.pow(stockVolatility, 2) + bondWeight * covariance
-  ) / portfolioVol;
+  for (let i = 0; i < assets.length; i++) {
+    let marginalContrib = 0;
 
-  const bondContribution = bondWeight * (
-    bondWeight * Math.pow(bondVolatility, 2) + stockWeight * covariance
-  ) / portfolioVol;
+    for (let j = 0; j < assets.length; j++) {
+      const wj = assets[j].weight;
+      const sigmaI = assets[i].volatility;
+      const sigmaJ = assets[j].volatility;
+      const rhoIJ = correlationMatrix[i][j];
 
-  const totalContribution = stockContribution + bondContribution;
+      marginalContrib += wj * sigmaI * sigmaJ * rhoIJ;
+    }
 
-  return {
-    stock: (stockContribution / totalContribution) * 100,
-    bond: (bondContribution / totalContribution) * 100,
-  };
+    // Risk contribution = weight * marginal contribution / portfolio vol
+    const riskContrib = assets[i].weight * marginalContrib / portfolioVol;
+    contributions.push(riskContrib);
+  }
+
+  // Normalize to percentages
+  const total = contributions.reduce((a, b) => a + b, 0);
+  return contributions.map(c => (c / total) * 100);
 }
 
-// Calculate Risk Parity weights (equal risk contribution)
-export function calculateRiskParityWeights(
-  stockVol: number,
-  bondVol: number,
-  _correlation: number
-): RiskParityWeights {
-  // For uncorrelated assets: w_stock / w_bond = sigma_bond / sigma_stock
-  // For correlated assets, we use numerical optimization, but for simplicity
-  // we use the inverse volatility weighting as a good approximation
-  // Note: _correlation parameter reserved for future enhancement with full optimization
-
-  // More accurate formula considering correlation:
-  // This is a simplified version that works well for low correlations
-  const inverseStockVol = 1 / stockVol;
-  const inverseBondVol = 1 / bondVol;
-  const total = inverseStockVol + inverseBondVol;
+// Calculate Risk Parity weights (equal risk contribution) using inverse volatility
+// Excludes cash (very low vol assets) from allocation to keep leverage reasonable
+export function calculateRiskParityWeights(assets: AssetClass[]): RiskParityWeights {
+  // Simplified: inverse volatility weighting
+  // Exclude cash (vol < 2%) to keep leverage reasonable - only allocate to risky assets
+  const inverseVols = assets.map(a => a.volatility >= 0.02 ? 1 / a.volatility : 0);
+  const total = inverseVols.reduce((a, b) => a + b, 0);
 
   return {
-    stockWeight: inverseStockVol / total,
-    bondWeight: inverseBondVol / total,
+    weights: inverseVols.map(iv => total > 0 ? iv / total : 0),
   };
 }
 
 // Calculate full portfolio metrics
 export function calculatePortfolioMetrics(inputs: PortfolioInputs): PortfolioMetrics {
   const riskFreeRate = inputs.riskFreeRate ?? PANAGORA_DEFAULTS.riskFreeRate;
+  const { assets, leverage } = inputs;
 
-  // Derive expected returns from Sharpe ratios if not provided
-  const stockExpectedReturn = inputs.stockExpectedReturn ??
-    (PANAGORA_DEFAULTS.stockSharpe * inputs.stockVolatility + riskFreeRate);
-  const bondExpectedReturn = inputs.bondExpectedReturn ??
-    (PANAGORA_DEFAULTS.bondSharpe * inputs.bondVolatility + riskFreeRate);
+  // Calculate expected returns from Sharpe ratios
+  const expectedReturns = assets.map(a => {
+    if (a.expectedReturn !== undefined) return a.expectedReturn;
+    const sharpe = a.sharpe ?? 0;
+    return sharpe * a.volatility + riskFreeRate;
+  });
 
   const portfolioVariance = calculatePortfolioVariance(inputs);
   const portfolioVolatility = Math.sqrt(portfolioVariance);
+  const riskContributions = calculateRiskContributions(inputs);
 
-  const riskContribution = calculateRiskContribution(inputs);
-
-  const expectedReturn =
-    inputs.stockWeight * stockExpectedReturn +
-    inputs.bondWeight * bondExpectedReturn;
+  // Portfolio expected return
+  const expectedReturn = assets.reduce((sum, a, i) => sum + a.weight * expectedReturns[i], 0);
 
   const excessReturn = expectedReturn - riskFreeRate;
-  const sharpeRatio = excessReturn / portfolioVolatility;
+  const sharpeRatio = portfolioVolatility > 0 ? excessReturn / portfolioVolatility : 0;
 
-  const leveragedVolatility = portfolioVolatility * inputs.leverage;
-  const leveragedReturn = riskFreeRate + excessReturn * inputs.leverage;
+  const leveragedVolatility = portfolioVolatility * leverage;
+  const leveragedReturn = riskFreeRate + excessReturn * leverage;
 
   return {
     portfolioVariance,
     portfolioVolatility,
-    stockRiskContribution: riskContribution.stock,
-    bondRiskContribution: riskContribution.bond,
+    riskContributions,
     sharpeRatio,
     expectedReturn,
     leveragedVolatility,
@@ -145,34 +179,59 @@ export function calculatePortfolioMetrics(inputs: PortfolioInputs): PortfolioMet
   };
 }
 
-// Generate efficient frontier points
+// Helper: Create portfolio inputs from simple parameters
+export function createPortfolioInputs(
+  weights: number[],
+  volatilities: number[],
+  correlationMatrix: number[][],
+  leverage: number = 1,
+  sharpes?: number[]
+): PortfolioInputs {
+  const names = ['Global Equity', 'Global Bonds', 'Commodities', 'Cash'];
+  const colors = [ASSET_COLORS.equity, ASSET_COLORS.bonds, ASSET_COLORS.commodities, ASSET_COLORS.cash];
+  const defaultSharpes = [0.40, 0.40, 0.30, 0.00];
+
+  const assets: AssetClass[] = weights.map((w, i) => ({
+    name: names[i] || `Asset ${i + 1}`,
+    volatility: volatilities[i] || 0.10,
+    weight: w,
+    sharpe: sharpes?.[i] ?? defaultSharpes[i],
+    color: colors[i] || '#888',
+  }));
+
+  return {
+    assets,
+    correlationMatrix,
+    leverage,
+  };
+}
+
+// Generate efficient frontier points (simplified for 4 assets - varies equity weight)
 export function generateEfficientFrontier(
-  stockVol: number,
-  bondVol: number,
-  correlation: number,
+  volatilities: number[],
+  correlationMatrix: number[][],
   points: number = 50
-): Array<{ risk: number; return: number; stockWeight: number }> {
-  const frontier: Array<{ risk: number; return: number; stockWeight: number }> = [];
+): Array<{ risk: number; return: number; equityWeight: number }> {
+  const frontier: Array<{ risk: number; return: number; equityWeight: number }> = [];
 
   for (let i = 0; i <= points; i++) {
-    const stockWeight = i / points;
-    const bondWeight = 1 - stockWeight;
+    const equityWeight = i / points;
+    // Distribute remaining weight: 60% bonds, 30% commodities, 10% cash of the non-equity portion
+    const remaining = 1 - equityWeight;
+    const weights = [
+      equityWeight,
+      remaining * 0.6,
+      remaining * 0.3,
+      remaining * 0.1,
+    ];
 
-    const inputs: PortfolioInputs = {
-      stockVolatility: stockVol,
-      bondVolatility: bondVol,
-      correlation,
-      stockWeight,
-      bondWeight,
-      leverage: 1,
-    };
-
+    const inputs = createPortfolioInputs(weights, volatilities, correlationMatrix);
     const metrics = calculatePortfolioMetrics(inputs);
 
     frontier.push({
       risk: metrics.portfolioVolatility * 100,
       return: metrics.expectedReturn * 100,
-      stockWeight: stockWeight * 100,
+      equityWeight: equityWeight * 100,
     });
   }
 
@@ -181,27 +240,18 @@ export function generateEfficientFrontier(
 
 // Calculate leveraged frontier (risk parity with varying leverage)
 export function generateLeveragedFrontier(
-  stockVol: number,
-  bondVol: number,
-  correlation: number,
+  volatilities: number[],
+  correlationMatrix: number[][],
   maxLeverage: number = 4,
   points: number = 50
 ): Array<{ risk: number; return: number; leverage: number }> {
-  const riskParityWeights = calculateRiskParityWeights(stockVol, bondVol, correlation);
+  const tempAssets = DEFAULT_ASSETS.map((a, i) => ({ ...a, volatility: volatilities[i] }));
+  const riskParityWeights = calculateRiskParityWeights(tempAssets);
   const frontier: Array<{ risk: number; return: number; leverage: number }> = [];
 
   for (let i = 0; i <= points; i++) {
     const leverage = 1 + (maxLeverage - 1) * (i / points);
-
-    const inputs: PortfolioInputs = {
-      stockVolatility: stockVol,
-      bondVolatility: bondVol,
-      correlation,
-      stockWeight: riskParityWeights.stockWeight,
-      bondWeight: riskParityWeights.bondWeight,
-      leverage,
-    };
-
+    const inputs = createPortfolioInputs(riskParityWeights.weights, volatilities, correlationMatrix, leverage);
     const metrics = calculatePortfolioMetrics(inputs);
 
     frontier.push({
@@ -222,4 +272,68 @@ export function formatPercent(value: number, decimals: number = 1): string {
 // Format ratio for display
 export function formatRatio(value: number, decimals: number = 2): string {
   return value.toFixed(decimals);
+}
+
+// Legacy compatibility - 2 asset calculations
+export interface LegacyPortfolioInputs {
+  stockVolatility: number;
+  bondVolatility: number;
+  correlation: number;
+  stockWeight: number;
+  bondWeight: number;
+  leverage: number;
+  riskFreeRate?: number;
+  stockExpectedReturn?: number;
+  bondExpectedReturn?: number;
+}
+
+export interface LegacyPortfolioMetrics {
+  portfolioVariance: number;
+  portfolioVolatility: number;
+  stockRiskContribution: number;
+  bondRiskContribution: number;
+  sharpeRatio: number;
+  expectedReturn: number;
+  leveragedVolatility: number;
+  leveragedReturn: number;
+}
+
+export function calculateLegacyPortfolioMetrics(inputs: LegacyPortfolioInputs): LegacyPortfolioMetrics {
+  const weights = [inputs.stockWeight, inputs.bondWeight, 0, 0];
+  const volatilities = [inputs.stockVolatility, inputs.bondVolatility, 0.20, 0.01];
+  const correlationMatrix = [
+    [1, inputs.correlation, 0.3, 0],
+    [inputs.correlation, 1, 0, 0],
+    [0.3, 0, 1, 0],
+    [0, 0, 0, 1],
+  ];
+
+  const portfolioInputs = createPortfolioInputs(weights, volatilities, correlationMatrix, inputs.leverage);
+  const metrics = calculatePortfolioMetrics(portfolioInputs);
+
+  return {
+    portfolioVariance: metrics.portfolioVariance,
+    portfolioVolatility: metrics.portfolioVolatility,
+    stockRiskContribution: metrics.riskContributions[0],
+    bondRiskContribution: metrics.riskContributions[1],
+    sharpeRatio: metrics.sharpeRatio,
+    expectedReturn: metrics.expectedReturn,
+    leveragedVolatility: metrics.leveragedVolatility,
+    leveragedReturn: metrics.leveragedReturn,
+  };
+}
+
+export function calculateLegacyRiskParityWeights(
+  stockVol: number,
+  bondVol: number,
+  _correlation: number
+): { stockWeight: number; bondWeight: number } {
+  const inverseStockVol = 1 / stockVol;
+  const inverseBondVol = 1 / bondVol;
+  const total = inverseStockVol + inverseBondVol;
+
+  return {
+    stockWeight: inverseStockVol / total,
+    bondWeight: inverseBondVol / total,
+  };
 }

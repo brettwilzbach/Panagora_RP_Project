@@ -198,3 +198,4 @@ After deployment:
 
 **Note**: This is a static site deployment. For server-side features, you would need to add a backend service to your Railway project.
 
+

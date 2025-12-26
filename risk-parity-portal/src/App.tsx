@@ -10,6 +10,7 @@ import { PANAGORA_DEFAULTS } from '@/lib/calculations';
 
 function App() {
   const [activeTab, setActiveTab] = useState('overview');
+  const [quizAnswer, setQuizAnswer] = useState<number | null>(null);
   const [simParams, setSimParams] = useState({
     stockVol: PANAGORA_DEFAULTS.stockVolatility,
     bondVol: PANAGORA_DEFAULTS.bondVolatility,
@@ -36,62 +37,142 @@ function App() {
                 animate={{ opacity: 1, y: 0 }}
                 className="space-y-5"
               >
-                {/* Lead with risk - the hook */}
-                <div className="text-center">
-                  <h1 className="text-2xl font-bold text-foreground mb-2">
-                    60/40 looks balanced by dollars,<br />
-                    but it's <span className="text-primary">93% equity risk</span>.
+                {/* Interactive Quiz Hook */}
+                <div className="text-center space-y-4">
+                  <h1 className="text-2xl font-bold text-foreground">
+                    A 60/40 portfolio is 60% stocks, 40% bonds.
                   </h1>
+                  <p className="text-lg text-muted-foreground">
+                    What percent of your <strong className="text-foreground">risk</strong> comes from stocks?
+                  </p>
+
+                  {quizAnswer === null ? (
+                    <div className="flex justify-center gap-2">
+                      {[60, 75, 85, 93].map((pct) => (
+                        <button
+                          key={pct}
+                          onClick={() => setQuizAnswer(pct)}
+                          className="w-16 h-16 rounded-xl bg-muted hover:bg-primary hover:text-primary-foreground transition-all text-lg font-semibold"
+                        >
+                          {pct}%
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <p className="text-lg font-medium">
+                        {quizAnswer === 93 ? (
+                          <span className="text-primary">Correct! It's 93%.</span>
+                        ) : (
+                          <>
+                            You guessed {quizAnswer}%. It's actually <span className="text-primary font-bold">93%</span>.
+                          </>
+                        )}
+                      </p>
+
+                      {/* Capital vs Risk visual preview */}
+                      <div className="flex justify-center gap-8">
+                        {/* Capital bar */}
+                        <div className="flex flex-col items-center">
+                          <div className="w-20 h-36 flex flex-col justify-end rounded-t overflow-hidden bg-muted/30 border border-border">
+                            <motion.div
+                              initial={{ height: 0 }}
+                              animate={{ height: '40%' }}
+                              transition={{ duration: 0.6, ease: 'easeOut' }}
+                              className="w-full bg-gray-400"
+                            />
+                            <motion.div
+                              initial={{ height: 0 }}
+                              animate={{ height: '60%' }}
+                              transition={{ duration: 0.6, ease: 'easeOut', delay: 0.1 }}
+                              className="w-full bg-primary"
+                            />
+                          </div>
+                          <span className="text-sm text-muted-foreground mt-2">Capital</span>
+                        </div>
+
+                        {/* Risk bar */}
+                        <div className="flex flex-col items-center">
+                          <div className="w-20 h-36 flex flex-col justify-end rounded-t overflow-hidden bg-muted/30 border border-border">
+                            <motion.div
+                              initial={{ height: 0 }}
+                              animate={{ height: '7%' }}
+                              transition={{ duration: 0.8, ease: 'easeOut', delay: 0.3 }}
+                              className="w-full bg-gray-400"
+                            />
+                            <motion.div
+                              initial={{ height: 0 }}
+                              animate={{ height: '93%' }}
+                              transition={{ duration: 0.8, ease: 'easeOut', delay: 0.4 }}
+                              className="w-full bg-primary"
+                            />
+                          </div>
+                          <span className="text-sm text-muted-foreground mt-2">Risk</span>
+                        </div>
+
+                        {/* Arrow indicator */}
+                        <div className="flex items-center">
+                          <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                          </svg>
+                        </div>
+                      </div>
+
+                      <p className="text-sm text-muted-foreground">
+                        Stocks are ~3x more volatile than bonds, so 60% of capital = 93% of risk.
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Define terms once */}
-                <div className="flex justify-center gap-6 text-xs text-muted-foreground">
-                  <span><strong className="text-foreground">Capital</strong> = dollars invested</span>
-                  <span><strong className="text-foreground">Risk</strong> = where drawdowns come from</span>
-                  <span><strong className="text-foreground">Sharpe</strong> = return per unit of risk</span>
+                <div className="text-center text-xs text-muted-foreground max-w-xl mx-auto">
+                  <span className="inline-block mx-2"><strong className="text-foreground">Capital</strong> = dollars invested</span>
+                  <span className="inline-block mx-2"><strong className="text-foreground">Risk</strong> = portfolio volatility</span>
+                  <span className="inline-block mx-2"><strong className="text-foreground">Sharpe</strong> = return per unit of risk</span>
                 </div>
 
                 {/* The 5-step narrative */}
                 <div className="max-w-xl mx-auto space-y-3 text-sm">
-                  <div className="p-3 rounded-lg bg-muted/50 flex gap-3">
-                    <span className="text-primary font-bold">1</span>
+                  <div className="p-3 rounded-lg bg-muted/50 flex gap-3 items-baseline">
+                    <span className="text-primary font-bold text-base">1</span>
                     <p className="text-muted-foreground">
-                      <strong className="text-foreground">Risk is not the same as dollars.</strong> Stocks are 3x more volatile than bonds, so 60% in stocks = 93% of your risk.
+                      <strong className="text-foreground text-base">Stocks are ~3× more volatile</strong> → 60% capital ≈ 93% risk.
                     </p>
                   </div>
 
-                  <div className="p-3 rounded-lg bg-primary/5 border border-primary/20 flex gap-3">
-                    <span className="text-primary font-bold">2</span>
+                  <div className="p-3 rounded-lg bg-primary/5 border border-primary/20 flex gap-3 items-baseline">
+                    <span className="text-primary font-bold text-base">2</span>
                     <p className="text-muted-foreground">
-                      <strong className="text-primary">Risk parity balances risk at 50/50.</strong> Hold 3x more bonds than stocks by capital (~25/75) to equalize risk contribution.
+                      <strong className="text-primary text-base">Risk parity targets 50/50 risk</strong> → ~25/75 capital.
                     </p>
                   </div>
 
-                  <div className="p-3 rounded-lg bg-muted/50 flex gap-3">
-                    <span className="text-primary font-bold">3</span>
+                  <div className="p-3 rounded-lg bg-muted/50 flex gap-3 items-baseline">
+                    <span className="text-primary font-bold text-base">3</span>
                     <p className="text-muted-foreground">
-                      <strong className="text-foreground">When correlation is low, that balance pays off.</strong> You get more return per unit of risk (higher Sharpe).
+                      <strong className="text-foreground text-base">When correlation is low,</strong> the balance pays off (higher Sharpe).
                     </p>
                   </div>
 
-                  <div className="p-3 rounded-lg bg-muted/50 flex gap-3">
-                    <span className="text-primary font-bold">4</span>
+                  <div className="p-3 rounded-lg bg-muted/50 flex gap-3 items-baseline">
+                    <span className="text-primary font-bold text-base">4</span>
                     <p className="text-muted-foreground">
-                      <strong className="text-foreground">When correlation spikes, the advantage fades.</strong> If stocks and bonds move together, risk parity can't diversify.
+                      <strong className="text-foreground text-base">In high correlation,</strong> results converge.
                     </p>
                   </div>
 
-                  <div className="p-3 rounded-lg bg-muted/50 flex gap-3">
-                    <span className="text-primary font-bold">5</span>
+                  <div className="p-3 rounded-lg bg-muted/50 flex gap-3 items-baseline">
+                    <span className="text-primary font-bold text-base">5</span>
                     <p className="text-muted-foreground">
-                      <strong className="text-foreground">That's why the approach is resilient, not omnipotent.</strong> It works best when diversification works.
+                      <strong className="text-foreground text-base">Designed for long-run diversification</strong> across market cycles.
                     </p>
                   </div>
                 </div>
 
                 {/* Result stat - updated with S&P data */}
-                <div className="text-center p-4 rounded-lg bg-primary/5 border border-primary/20">
-                  <p className="text-lg font-medium">
+                <div className="text-center p-4 rounded-lg bg-primary/5 border border-primary/20 max-w-xl mx-auto">
+                  <p className="text-xl font-semibold">
                     <span className="text-muted-foreground">0.65 Sharpe (60/40)</span>
                     {' → '}
                     <span className="text-primary">0.87 Sharpe (Risk Parity)</span>
@@ -99,7 +180,7 @@ function App() {
                     <span className="text-primary font-bold">+34%</span>
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    S&P Risk Parity Index (10% vol target) vs 60/40, 2004-2020
+                    S&P Risk Parity Index (10% vol target) vs 60/40, 2000-2025
                   </p>
                 </div>
 
@@ -112,7 +193,7 @@ function App() {
                 <EggBasketVisualizer />
 
                 {/* PanAgora advantage + CTA */}
-                <div className="text-center space-y-3">
+                <div className="text-center space-y-3 max-w-xl mx-auto">
                   <p className="text-xs text-muted-foreground">
                     <strong className="text-foreground">PanAgora edge:</strong> Smart data with economic intuition—attribution-aware optimization reduces quant-PM disconnect.
                   </p>
