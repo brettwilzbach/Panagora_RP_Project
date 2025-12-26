@@ -2,7 +2,8 @@
 nixPkgs = ["nodejs_18", "npm-9_x"]
 
 [phases.install]
-cmds = ["npm install"]
+# Use npm install instead of npm ci to handle cases where package-lock.json might not be present
+cmds = ["npm install --legacy-peer-deps"]
 
 [phases.build]
 cmds = ["npm run build"]
