@@ -35,10 +35,10 @@ function App() {
               <motion.div
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="space-y-5 max-w-2xl mx-auto"
+                className="space-y-5"
               >
                 {/* Interactive Quiz Hook */}
-                <div className="text-center space-y-4">
+                <div className="text-center space-y-4 max-w-xl mx-auto">
                   <h1 className="text-2xl font-bold text-foreground">
                     A 60/40 portfolio is 60% stocks, 40% bonds.
                   </h1>
@@ -126,14 +126,14 @@ function App() {
                 </div>
 
                 {/* Define terms once */}
-                <div className="text-center text-xs text-muted-foreground">
+                <div className="text-center text-xs text-muted-foreground max-w-xl mx-auto">
                   <span className="inline-block mx-2"><strong className="text-foreground">Capital</strong> = dollars invested</span>
                   <span className="inline-block mx-2"><strong className="text-foreground">Risk</strong> = portfolio volatility</span>
                   <span className="inline-block mx-2"><strong className="text-foreground">Sharpe</strong> = return per unit of risk</span>
                 </div>
 
                 {/* The 5-step narrative */}
-                <div className="space-y-3 text-sm">
+                <div className="max-w-xl mx-auto space-y-3 text-sm">
                   <div className="p-3 rounded-lg bg-muted/50 flex gap-3 items-baseline">
                     <span className="text-primary font-bold text-base">1</span>
                     <p className="text-muted-foreground">
@@ -171,7 +171,7 @@ function App() {
                 </div>
 
                 {/* Result stat - updated with S&P data */}
-                <div className="text-center p-4 rounded-lg bg-primary/5 border border-primary/20">
+                <div className="text-center p-4 rounded-lg bg-primary/5 border border-primary/20 max-w-xl mx-auto">
                   <p className="text-xl font-semibold">
                     <span className="text-muted-foreground">0.65 Sharpe (60/40)</span>
                     {' → '}
@@ -185,7 +185,7 @@ function App() {
                 </div>
 
                 {/* So what - investor outcomes */}
-                <div className="text-center text-sm text-muted-foreground">
+                <div className="text-center text-sm text-muted-foreground max-w-md mx-auto">
                   <strong className="text-foreground">The result:</strong> Drawdown control and a smoother ride, without sacrificing long-term returns.
                 </div>
 
@@ -193,7 +193,7 @@ function App() {
                 <EggBasketVisualizer />
 
                 {/* PanAgora advantage + CTA */}
-                <div className="text-center space-y-3">
+                <div className="text-center space-y-3 max-w-xl mx-auto">
                   <p className="text-xs text-muted-foreground">
                     <strong className="text-foreground">PanAgora edge:</strong> Smart data with economic intuition—attribution-aware optimization reduces quant-PM disconnect.
                   </p>
